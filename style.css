@@ -3,12 +3,13 @@ body {
     background-color: aqua;
 
     background-image: url("test.jpg");
-    background-repeat: space;
+    background-repeat: no-repeat;
     /* padding:80px 0px 50px 360px; */
     /* padding:10px 100px 60px 200px; */
-    background-position: center 10%
-    /* background-size: cover; */
+    background-position: center 10%;
+    /* background-size: cover */
     /* background-position: center; */
+    background-attachment: fixed;
 }
 
 h1 {
