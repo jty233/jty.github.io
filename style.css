@@ -37,7 +37,6 @@ section .color:nth-child(1) {
     width: 600px;
     height: 600px;
     background: #ff359b;
-    
 }
 
 section .color:nth-child(2) {
@@ -67,12 +66,11 @@ a {
     transition: 0.3s;
     overflow: hidden;
     -webkit-box-reflect: below 1px linear-gradient(transparent, #0003);
-
 }
 
 a:hover {
-    background: rgba(33,235,255,0.5);
-    color: rgba(0,0,0,0.6);
+    background: rgba(33, 235, 255, 0.5);
+    color: rgba(0, 0, 0, 0.6);
     box-shadow: 0 0 50px #21ebff;
     transition-delay: 0.3s;
 }
@@ -129,6 +127,36 @@ a:hover::after {
     position: absolute;
     /* transform: translateY(-50%); */
     height: 200px;
-    margin: 0,auto;
-    background: rgba(255,255,255,0.3);
+    margin: 0, auto;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+h2 {
+    position: absolute;
+    z-index: 1;
+    display: inline-block;
+    /* height: 100px; */
+    left: 0;
+    top: 0;
+    left: 50%; 
+    transform: translateX(-50%);
+    margin-top: 100px;
+    /* background-color: white; */
+}
+
+.text {
+    position: absolute;
+    z-index: 1;
+    display: inline-block;
+    /* height: 100px; */
+    left: 0;
+    top: 0;
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
+    margin-top: 100px;
+    /* background-color: white; */
+}
+
+.text pre {
+    font-size: 24px;
 }
