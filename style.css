@@ -37,6 +37,7 @@ section .color:nth-child(1) {
     width: 600px;
     height: 600px;
     background: #ff359b;
+    
 }
 
 section .color:nth-child(2) {
@@ -66,11 +67,12 @@ a {
     transition: 0.3s;
     overflow: hidden;
     -webkit-box-reflect: below 1px linear-gradient(transparent, #0003);
+
 }
 
 a:hover {
-    background: #21ebff;
-    color: #111;
+    background: rgba(33,235,255,0.5);
+    color: rgba(0,0,0,0.6);
     box-shadow: 0 0 50px #21ebff;
     transition-delay: 0.3s;
 }
