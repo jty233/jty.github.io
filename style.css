@@ -55,7 +55,7 @@ section .color:nth-child(3) {
     background: #fffd87;
 }
 
-a {
+section a {
     position: relative;
     padding: 10px 30px;
     margin: 0 45px;
@@ -68,22 +68,22 @@ a {
     -webkit-box-reflect: below 1px linear-gradient(transparent, #0003);
 }
 
-a:hover {
+section a:hover {
     background: rgba(33, 235, 255, 0.5);
     color: rgba(0, 0, 0, 0.6);
     box-shadow: 0 0 50px #21ebff;
     transition-delay: 0.3s;
 }
 
-a:nth-of-type(1) {
+section a:nth-of-type(1) {
     filter: hue-rotate(115deg);
 }
 
-a:nth-of-type(3) {
+section a:nth-of-type(3) {
     filter: hue-rotate(270deg);
 }
 
-a::before {
+section a::before {
     content: '';
     position: absolute;
     top: 0;
@@ -96,13 +96,13 @@ a::before {
     transition-delay: 0.3s;
 }
 
-a:hover::before {
+section a:hover::before {
     width: 100%;
     height: 100%;
     transition-delay: 0s;
 }
 
-a::after {
+section a::after {
     content: '';
     position: absolute;
     right: 0;
@@ -115,7 +115,7 @@ a::after {
     transition-delay: 0.3s;
 }
 
-a:hover::after {
+section a:hover::after {
     width: 100%;
     height: 100%;
     transition-delay: 0s;
@@ -138,7 +138,7 @@ h2 {
     /* height: 100px; */
     left: 0;
     top: 0;
-    left: 50%; 
+    left: 50%;
     transform: translateX(-50%);
     margin-top: 100px;
     /* background-color: white; */
@@ -159,4 +159,26 @@ h2 {
 
 .text pre {
     font-size: 24px;
+}
+
+.text a {
+    text-decoration: none;
+    display: block;
+    position: absolute;
+    height: 2em;
+    width: 6em;
+    text-align: center;
+    line-height: 2em;
+    color: black;
+    background-color: white;
+    left: 6em;
+    margin-top: -1em;
+    border-radius: 1em;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+
+}
+
+.text a:hover {
+    width: 10em;
 }
