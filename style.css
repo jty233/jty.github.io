@@ -129,6 +129,8 @@ section a:hover::after {
     height: 200px;
     margin: 0, auto;
     background: rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+
 }
 
 h2 {
@@ -172,13 +174,71 @@ h2 {
     color: black;
     background-color: white;
     left: 6em;
-    margin-top: -1em;
+    margin-top: -0.8em;
     border-radius: 1em;
     transition: 0.3s;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .text a:hover {
     width: 10em;
+}
+
+.text2 {
+    position: absolute;
+    z-index: 1;
+    display: inline-block;
+    text-align: center;
+    /* height: 100px; */
+    /* left: 0; */
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 100px;
+    /* background-color: white; */
+}
+
+.text2 input {
+    display: inline-block;
+    margin: 20px 0;
+    /* height: 30px; */
+    /* color: #21ebff; */
+    font-size: 16px;
+}
+
+.text2 button {
+    font-size: 16px;
+    padding: 1px 6px;
+}
+
+#progress {
+    height: 20px;
+    width: 600px;
+    border: 2px solid gold;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+#progress .progress-item {
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: chartreuse;
+    border-radius: 10px;
+    transition: width .3s linear;
+}
+
+.box2 {
+    /* width: 1000px;  */
+    width: 80%;
+    position: absolute;
+    /* transform: translateY(-50%); */
+    height: 300px;
+    margin: 0, auto;
+    /* margin-top: -200px; */
+    top: 80px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
 }
