@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #progress {
+            height: 10px;
+            width: 500px;
+            border: 1px solid gold;
+            position: relative;
+            border-radius: 5px;
+        }
+
+        #progress .progress-item {
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: chartreuse;
+            border-radius: 5px;
+            transition: width .3s linear;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>XMLHttpRequest 对象</h1>
+
+    文件上传框<br>
+    <input type="file" id="file"><br>
+    显示进度条<br>
+    <div id="progress">
+        <div class="progress-item"></div>
+    </div>
+    <button onclick="loadDoc()">点我上传</button>
+    上传成功后的返回内容<br>
+    <span id="callback"></span>
+
+    <script>
+        function loadDoc() {
+            var file = document.querySelector("#file").files[0];
+
+            //创建formdata对象
+            var formdata = new FormData();
+
+            var reader = new FileReader(); //实例化文件读取对象
+
+            reader.readAsDataURL(file); //将文件读取为 DataURL,也就是base64编码
+            reader.onload = function (ev) { //文件读取成功完成时触发
+                var dataURL = ev.target.result; //获得文件读取成功后的DataURL,也就是base64编码
+                // console.log(dataURL);
+
+                dataURL = dataURL.substring(dataURL.indexOf('base64') + 7);
+
+
+                var obj = {
+                    message: '',
+                    content: dataURL
+                }
+
+
+                formdata.append("file", file);
+                //创建xhr，使用ajax进行文件上传
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", "https://api.github.com/repos/jty233/disk/contents/" + file.name, true);
+                xhr.setRequestHeader('Authorization', 'token f73b7dd505452250a0abc3889bbd16da5dfe5601');
+                console.log(dataURL);
+                //获取上传的进度
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        var percent = event.loaded / event.total * 100;
+                        document.querySelector("#progress .progress-item").style.width = percent + "%";
+
+                        if (document.querySelector("#progress .progress-item").style.width == "100%") {
+                            
+                            alert("已成功上传")
+                            document.querySelector("#progress .progress-item").style.width = "0";
+                        }
+                    }
+                }
+                //将formdata上传
+                xhr.send(JSON.stringify(obj))
+
+            }
+
+
+        }
+    </script>
+
+</body>
+
+</html>
