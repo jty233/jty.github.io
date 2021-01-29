@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>下载文件</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" href="头像.png">
+
+</head>
+
+<body>
+
+
+    <section>
+        <!-- 背景颜色 -->
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
+
+    </section>
+
+    <div class="text3" id="parent">
+    </div>
+
+    <script>
+
+        var pre = new XMLHttpRequest();
+        url = "https://api.github.com/repos/jty233/disk/contents";
+        pre.open('GET', url, true);
+        pre.send();//第三步：发送请求  将请求参数写在URL中
+
+        pre.onreadystatechange = function () {
+            if (pre.readyState == XMLHttpRequest.DONE) {
+                var json = pre.responseText;
+                json = eval(json);
+                console.log(json);
+
+                for (var i = 0; i < json.length; i++) {
+                    console.log(json[i]['download_url']);
+                    addElementDiv(json[i]);
+                }
+            }
+        }
+
+
+        function addElementDiv(json) {
+            var parent = document.getElementById("parent");
+
+            //添加 div
+            var div = document.createElement("a");
+
+            //设置 div 属性，如 id
+            div.setAttribute("href",json["download_url"]);
+            div.setAttribute("download","download");
+            div.setAttribute("style","display=block")
+
+            div.innerHTML = json["name"];
+            parent.appendChild(div);
+        }
+
+    </script>
+
+
+
+</body>
+
+</html>
