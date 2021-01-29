@@ -6,48 +6,42 @@
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <style>
-        #progress {
-            height: 10px;
-            width: 500px;
-            border: 1px solid gold;
-            position: relative;
-            border-radius: 5px;
-        }
+    <title>上传文件</title>
 
-        #progress .progress-item {
-            height: 100%;
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: chartreuse;
-            border-radius: 5px;
-            transition: width .3s linear;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" href="头像.png">
 </head>
 
 <body>
 
-    <h1>XMLHttpRequest 对象</h1>
+    <section>
+        <!-- 背景颜色 -->
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
 
-    文件上传框<br>
-    <input type="file" id="file"><br>
-    显示进度条<br>
-    <div id="progress">
-        <div class="progress-item"></div>
+        <div class="box2"></div>
+    </section>
+
+
+
+    <div class="text2">
+        <h1>上传文件</h1>
+
+        
+        <input type="file" id="file" onclick="loadDoc()"><button onclick="loadDoc()">点我上传</button>
+
+        <div id="progress">
+            <div class="progress-item"></div>
+        </div>
+        <span id="time"></span>
+        <span id="callback"></span>
     </div>
-    <button onclick="loadDoc()">点我上传</button>
-    <span id="time">233</span>
-    <span id="callback"></span>
 
     <script>
         function loadDoc() {
             var file = document.querySelector("#file").files[0];
-
-            //创建formdata对象
-            var formdata = new FormData();
 
             var reader = new FileReader(); //实例化文件读取对象
 
@@ -58,94 +52,111 @@
 
                 dataURL = dataURL.substring(dataURL.indexOf('base64') + 7);
 
-
                 var obj = {
                     message: '',
                     content: dataURL
                 }
 
-
-                formdata.append("file", file);
                 //创建xhr，使用ajax进行文件上传
                 var xhr = new XMLHttpRequest();
-                xhr.open("PUT", "https://api.github.com/repos/jty233/disk/contents/" + file.name, true);
-                var encode = 'ZTMyODc5MzRjYTM2NDU4NjY2NzAzMTNmZDRlMzFjMmU4MTU4MmE4NQ=='
-                xhr.setRequestHeader('Authorization', 'token ' + window.atob(encode));
+                var pre = new XMLHttpRequest();
+                url = "https://api.github.com/repos/jty233/disk/contents/" + file.name;
+                pre.open('GET', url, true);
+                pre.send();//第三步：发送请求  将请求参数写在URL中
 
-                xhr.upload.onprogress = progressFunction;//【上传进度调用方法实现】
+                var nshow = 0;
 
-                xhr.upload.onloadstart = function () {//上传开始执行方法
+                pre.onreadystatechange = function () {
+                    if (pre.status == '404' && nshow == 0) {
+                        nshow = 1;
+                        xhr.open("PUT", url, true);
+                        var encode = 'ZTMyODc5MzRjYTM2NDU4NjY2NzAzMTNmZDRlMzFjMmU4MTU4MmE4NQ=='
+                        xhr.setRequestHeader('Authorization', 'token ' + window.atob(encode));
 
-                    ot = new Date().getTime(); //设置上传开始时间
+                        xhr.upload.onprogress = progressFunction;//【上传进度调用方法实现】
 
-                    oloaded = 0;//设置上传开始时，以上传的文件大小为0
-                }
+                        xhr.upload.onloadstart = function () {//上传开始执行方法
 
-                function progressFunction(evt) {
-                    var time = document.getElementById("time");
+                            ot = new Date().getTime(); //设置上传开始时间
 
-                    var nt = new Date().getTime();//获取当前时间
+                            oloaded = 0;//设置上传开始时，以上传的文件大小为0
+                        }
 
-                    var pertime = (nt - ot) / 1000; //计算出上次调用该方法时到现在的时间差，单位为s
+                        function progressFunction(evt) {
+                            var time = document.getElementById("time");
 
-                    ot = new Date().getTime(); //重新赋值时间，用于下次计算
+                            var nt = new Date().getTime();//获取当前时间
 
-                    var perload = evt.loaded - oloaded; //计算该分段上传的文件大小，单位b
+                            var pertime = (nt - ot) / 1000; //计算出上次调用该方法时到现在的时间差，单位为s
 
-                    oloaded = evt.loaded;//重新赋值已上传文件大小，用以下次计算
+                            ot = new Date().getTime(); //重新赋值时间，用于下次计算
 
-                    //上传速度计算
+                            var perload = evt.loaded - oloaded; //计算该分段上传的文件大小，单位b
 
-                    var speed = perload / pertime;//单位b/s
+                            oloaded = evt.loaded;//重新赋值已上传文件大小，用以下次计算
 
-                    var bspeed = speed;
+                            //上传速度计算
 
-                    var units = 'b/s';//单位名称
+                            var speed = perload / pertime;//单位b/s
 
-                    if (speed / 1024 > 1) {
-                        speed = speed / 1024;
+                            var bspeed = speed;
 
-                        units = 'k/s';
+                            var units = 'b/s';//单位名称
 
+                            if (speed / 1024 > 1) {
+                                speed = speed / 1024;
+
+                                units = 'k/s';
+
+                            }
+
+                            if (speed / 1024 > 1) {
+                                speed = speed / 1024;
+
+                                units = 'M/s';
+
+                            }
+
+                            speed = speed.toFixed(1);
+
+                            //剩余时间
+
+                            var resttime = ((evt.total - evt.loaded) / bspeed).toFixed(1);
+
+                            time.innerHTML = '速度：' + speed + units + '，剩余时间：' + resttime + 's';
+
+                            var percent = event.loaded / event.total * 100;
+                            document.querySelector("#progress .progress-item").style.width = percent + "%";
+
+                        }
+
+                        var show = false;
+                        xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中                    
+                            if (xhr.status == 201 && show == false) {//验证请求是否发送成功
+                                alert("已成功上传文件");
+                                show = true;
+                                document.querySelector("#progress .progress-item").style.width = 0;
+                                time.innerHTML = '';
+                            }
+                            else if (xhr.status != 201 && show == false) {
+                                alert("上传失败");
+                                show = true;
+                                var json = xhr.responseText;//获取到服务端返回的数据
+                                console.log(json);
+                                document.querySelector("#progress .progress-item").style.width = 0;
+                                time.innerHTML = '';
+                            }
+                        };
+
+                        xhr.send(JSON.stringify(obj))
                     }
-
-                    if (speed / 1024 > 1) {
-                        speed = speed / 1024;
-
-                        units = 'M/s';
-
+                    else if (nshow == 0) {
+                        alert("资源已存在");
+                        var json = xhr.responseText;//获取到服务端返回的数据
+                        console.log(json);
+                        nshow = true;
                     }
-
-                    speed = speed.toFixed(1);
-
-                    //剩余时间
-
-                    var resttime = ((evt.total - evt.loaded) / bspeed).toFixed(1);
-
-                    time.innerHTML = '，速度：' + speed + units + '，剩余时间：' + resttime + 's';
-
-                    if (resttime == 0)
-                    {
-                        alert("已成功上传");
-                    }
-
-                }
-
-                //获取上传的进度
-                // xhr.upload.onprogress = function (event) {
-                //     if (event.lengthComputable) {
-                //         var percent = event.loaded / event.total * 100;
-                //         document.querySelector("#progress .progress-item").style.width = percent + "%";
-
-                //         if (document.querySelector("#progress .progress-item").style.width == "100%") {
-
-                //             document.querySelector("#progress .progress-item").style.width = "0";
-                //             alert("已成功上传")
-                //         }
-                //     }
-                // }
-                //将formdata上传
-                xhr.send(JSON.stringify(obj))
+                };
 
             }
         }
