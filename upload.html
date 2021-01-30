@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="style.css">
 
     <link rel="icon" href="头像.png">
+
+
 </head>
 
 <body>
@@ -29,8 +31,8 @@
     <div class="text2">
         <h1>上传文件</h1>
 
-        
-        <input type="file" id="file" /><button onclick="loadDoc()">点我上传</button>
+
+        <input type="file" id="file" multiple><button onclick="send()">点我上传</button>
 
         <div id="progress">
             <div class="progress-item"></div>
@@ -40,126 +42,152 @@
     </div>
 
     <script>
-        function loadDoc() {
-            var file = document.querySelector("#file").files[0];
 
-            var reader = new FileReader(); //实例化文件读取对象
+        let dataArr = [];
+        let input = document.getElementById("file");
+        input.addEventListener('change', readFile, false);
 
-            reader.readAsDataURL(file); //将文件读取为 DataURL,也就是base64编码
-            reader.onload = function (ev) { //文件读取成功完成时触发
-                var dataURL = ev.target.result; //获得文件读取成功后的DataURL,也就是base64编码
-                // console.log(dataURL);
+        function readFile() {
 
-                dataURL = dataURL.substring(dataURL.indexOf('base64') + 7);
+            let files = document.querySelector("#file");
 
-                var obj = {
-                    message: '',
-                    content: dataURL
+            let iLen = files.files.length;
+            let fd = new FormData();
+
+
+            for (let i = 0; i < iLen; i++) {
+                let reader = new FileReader(); //实例化文件读取对象
+                reader.index = i;
+                fd.append(i, files.files[i]);
+                reader.readAsDataURL(files.files[i]); //将文件读取为 DataURL,也就是base64编码
+                reader.fileName = files.files[i].name;
+
+                reader.onload = function (e) {
+                    //设置图片信息对象
+                    // 方便后面submit的时候，将数据传给后台
+                    let imgMsg = {
+                        name: this.fileName,//获取文件名    
+                        base64: this.result
+                    }
+                    dataArr.push(imgMsg);   //将图片信息对象存到数据数组中
                 }
-
-                //创建xhr，使用ajax进行文件上传
-                var xhr = new XMLHttpRequest();
-                var pre = new XMLHttpRequest();
-                url = "https://api.github.com/repos/jty233/disk/contents/" + file.name;
-                pre.open('GET', url, true);
-                pre.send();//第三步：发送请求  将请求参数写在URL中
-
-                var nshow = 0;
-
-                pre.onreadystatechange = function () {
-                    if (pre.status == '404' && nshow == 0) {
-                        nshow = 1;
-                        xhr.open("PUT", url, true);
-                        var encode = 'ZTMyODc5MzRjYTM2NDU4NjY2NzAzMTNmZDRlMzFjMmU4MTU4MmE4NQ=='
-                        xhr.setRequestHeader('Authorization', 'token ' + window.atob(encode));
-
-                        xhr.upload.onprogress = progressFunction;//【上传进度调用方法实现】
-
-                        xhr.upload.onloadstart = function () {//上传开始执行方法
-
-                            ot = new Date().getTime(); //设置上传开始时间
-
-                            oloaded = 0;//设置上传开始时，以上传的文件大小为0
-                        }
-
-                        function progressFunction(evt) {
-                            var time = document.getElementById("time");
-
-                            var nt = new Date().getTime();//获取当前时间
-
-                            var pertime = (nt - ot) / 1000; //计算出上次调用该方法时到现在的时间差，单位为s
-
-                            ot = new Date().getTime(); //重新赋值时间，用于下次计算
-
-                            var perload = evt.loaded - oloaded; //计算该分段上传的文件大小，单位b
-
-                            oloaded = evt.loaded;//重新赋值已上传文件大小，用以下次计算
-
-                            //上传速度计算
-
-                            var speed = perload / pertime;//单位b/s
-
-                            var bspeed = speed;
-
-                            var units = 'b/s';//单位名称
-
-                            if (speed / 1024 > 1) {
-                                speed = speed / 1024;
-
-                                units = 'k/s';
-
-                            }
-
-                            if (speed / 1024 > 1) {
-                                speed = speed / 1024;
-
-                                units = 'M/s';
-
-                            }
-
-                            speed = speed.toFixed(1);
-
-                            //剩余时间
-
-                            var resttime = ((evt.total - evt.loaded) / bspeed).toFixed(1);
-
-                            time.innerHTML = '速度：' + speed + units + '，剩余时间：' + resttime + 's';
-
-                            var percent = event.loaded / event.total * 100;
-                            document.querySelector("#progress .progress-item").style.width = percent + "%";
-
-                        }
-
-                        var show = false;
-                        xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中                    
-                            if (xhr.status == 201 && show == false) {//验证请求是否发送成功
-                                alert("已成功上传文件");
-                                show = true;
-                                document.querySelector("#progress .progress-item").style.width = 0;
-                                time.innerHTML = '';
-                            }
-                            else if (xhr.status != 201 && show == false) {
-                                alert("上传失败");
-                                show = true;
-                                var json = xhr.responseText;//获取到服务端返回的数据
-                                console.log(json);
-                                document.querySelector("#progress .progress-item").style.width = 0;
-                                time.innerHTML = '';
-                            }
-                        };
-
-                        xhr.send(JSON.stringify(obj))
-                    }
-                    else if (nshow == 0) {
-                        alert("资源已存在");
-                        var json = xhr.responseText;//获取到服务端返回的数据
-                        console.log(json);
-                        nshow = true;
-                    }
-                };
-
             }
         }
+
+        let rightnum = 0;
+        let wrongnum = 0;
+
+
+        function send() {
+
+            if (dataArr.length == 0) {
+                alert("请先选择文件");
+                return;
+            }
+            for (let i = 0; i < dataArr.length; i++) {
+                if (dataArr[i]) {
+
+                    uploadfile(i);
+                }
+            }
+
+        }
+
+        function uploadfile(i) {
+            let dataURL = dataArr[i].base64;
+            let filename = dataArr[i].name;
+
+            // console.log("正在发送第" + i + "个，文件名为" + filename);
+            dataURL = dataURL.substring(dataURL.indexOf('base64') + 7);
+            // console.log(dataURL);
+
+            let obj = {
+                message: '',
+                content: dataURL
+            }
+            let check = new XMLHttpRequest();
+            url = "https://api.github.com/repos/jty233/disk/contents/" + filename;
+            // check.open('GET', url, true);
+            // check.send();//第三步：发送请求  将请求参数写在URL中
+
+            // check.onreadystatechange = function () {
+            //     if (check.readyState == 4) {
+            //         if (check.status == 404) {
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", url, true);
+            let encode = 'ZTMyODc5MzRjYTM2NDU4NjY2NzAzMTNmZDRlMzFjMmU4MTU4MmE4NQ=='
+            xhr.setRequestHeader('Authorization', 'token ' + window.atob(encode));
+
+            xhr.upload.onprogress = progressFunction;//【上传进度调用方法实现】
+
+            xhr.upload.onloadstart = function () {//上传开始执行方法
+                ot = new Date().getTime(); //设置上传开始时间
+                oloaded = 0;//设置上传开始时，以上传的文件大小为0
+            }
+
+            function progressFunction(evt) {
+                let time = document.getElementById("time");
+                let nt = new Date().getTime();//获取当前时间
+                let pertime = (nt - ot) / 1000; //计算出上次调用该方法时到现在的时间差，单位为s
+                ot = new Date().getTime(); //重新赋值时间，用于下次计算
+                let perload = evt.loaded - oloaded; //计算该分段上传的文件大小，单位b
+                oloaded = evt.loaded;//重新赋值已上传文件大小，用以下次计算
+                //上传速度计算
+                let speed = perload / pertime;//单位b/s
+                let bspeed = speed;
+                speed /= 1024;
+                speed = speed.toFixed(1);
+                //剩余时间
+                let resttime = ((evt.total - evt.loaded) / bspeed).toFixed(1);
+                time.innerHTML = '速度：' + speed + 'KB/s，剩余时间：' + resttime + 's';
+                let percent = event.loaded / event.total * 100;
+                document.querySelector("#progress .progress-item").style.width = percent + "%";
+            }
+
+            xhr.onreadystatechange = function () {//请求后的回调接口，可将请求成功后要执行的程序写在其中
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 201) {//验证请求是否发送成功
+                        rightnum++;
+                        console.log("第" + i + "个，已完成，总完成数为" + rightnum);
+                        if (rightnum == dataArr.length) {
+
+                            alert("已全部完成");
+                            dataArr = [];
+                            rightnum = 0;
+                        }
+                        else if (rightnum + wrongnum == dataArr.length) {
+                            alert("已成功上传" + rightnum + "个");
+                            dataArr = [];
+                            rightnum = 0;
+                            wrongnum = 0;
+                        }
+                    }
+                    else if (xhr.status == 409) {
+                        console.log("第" + i + "个上传失败，已重新上传");
+                        uploadfile(i);
+                    }
+                    else {
+                        alert(filename + "上传失败,可能为文件名重复");
+                        wrongnum++;
+                        let json = xhr.responseText;//获取到服务端返回的数据
+                        console.log(json);
+                    }
+                }
+
+            };
+
+            xhr.send(JSON.stringify(obj))
+            //     }
+            //     else {
+            //         alert("资源已存在");
+            //         let json = check.responseText;//获取到服务端返回的数据
+            //         console.log(json);
+            //     }
+
+            // }
+            // }
+        }
+
 
 
     </script>
